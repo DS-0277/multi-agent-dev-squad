@@ -20,7 +20,7 @@
 | Step | Title | Explained | Built | Pushed |
 |---|---|---|---|---|
 | 1 | Environment Setup & Project Layout | ✅ | ✅ | ✅ |
-| 2 | Use AI to Create the Initial Draft | ⬜ | ⬜ | ⬜ |
+| 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ⬜ (awaiting push) |
 | 3 | Audit & Verify the AI Output | ⬜ | ⬜ | ⬜ |
 | 4 | Build the Interactive Web Interface | ⬜ | ⬜ | ⬜ |
 | 5 | Execute Structured Web Project QA Test Suite | ⬜ | ⬜ | ⬜ |
@@ -44,17 +44,17 @@
 
 ---
 
-## Step 2: Use AI to Create the Initial Draft — ⬜
+## Step 2: Use AI to Create the Initial Draft — 🟡 (built, push pending)
 
 **Goal:** Generate the baseline squad with an AI coding tool, using the assignment's sample prompt, and keep the draft as-is for the audit.
 
-- [ ] Use the sample prompt (adapted) to generate the baseline code
-- [ ] Draft `schemas.py`: `SpecArtifact`, `CodeArtifact`, `QAReport`
-- [ ] Draft `sandbox.py`: subprocess test runner
-- [ ] Draft the three agents (spec, coder, reviewer)
-- [ ] Draft `orchestrator.py`: Spec → Coder → QA → retry loop, `max_iterations = 4`
-- [ ] Save the exact prompt and the raw output notes in `ai_prompt_log.md` (the "before" snapshot)
-- [ ] Commit the unmodified draft separately so the audit diff is visible in git history
+- [x] Use the sample prompt (adapted) to generate the baseline code
+- [x] Draft `schemas.py`: `SpecArtifact`, `CodeArtifact`, `QAReport`
+- [x] Draft `sandbox.py`: subprocess test runner
+- [x] Draft the three agents (spec, coder, reviewer)
+- [x] Draft `orchestrator.py`: Spec → Coder → QA → retry loop, `max_iterations = 4`
+- [x] Save the exact prompt and the raw output notes in `ai_prompt_log.md` (the "before" snapshot)
+- [x] Commit the unmodified draft separately so the audit diff is visible in git history
 
 **Done when:** All files exist with a first working version, and the original prompt is logged.
 
@@ -145,6 +145,7 @@
 | Date | Update |
 |---|---|
 | 2026-11-26 | Plan created and approved |
+| 2026-11-26 | Step 2 draft generated and committed unaudited; push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
