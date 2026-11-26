@@ -20,7 +20,7 @@
 | Step | Title | Explained | Built | Pushed |
 |---|---|---|---|---|
 | 1 | Environment Setup & Project Layout | ✅ | ✅ | ✅ |
-| 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ⬜ (awaiting push) |
+| 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ✅ |
 | 3 | Audit & Verify the AI Output | ⬜ | ⬜ | ⬜ |
 | 4 | Build the Interactive Web Interface | ⬜ | ⬜ | ⬜ |
 | 5 | Execute Structured Web Project QA Test Suite | ⬜ | ⬜ | ⬜ |
@@ -44,7 +44,7 @@
 
 ---
 
-## Step 2: Use AI to Create the Initial Draft — 🟡 (built, push pending)
+## Step 2: Use AI to Create the Initial Draft — ✅
 
 **Goal:** Generate the baseline squad with an AI coding tool, using the assignment's sample prompt, and keep the draft as-is for the audit.
 
@@ -145,7 +145,7 @@
 | Date | Update |
 |---|---|
 | 2026-11-26 | Plan created and approved |
-| 2026-11-26 | Step 2 draft generated and committed unaudited; push pending |
+| 2026-11-26 | Step 2 draft generated and committed unaudited and pushed |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
