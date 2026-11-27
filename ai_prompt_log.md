@@ -138,3 +138,13 @@ Built `src/app.py` (Streamlit) and made the orchestrator stream progress (`strea
 - **Required Tests 1 to 6** are in `tests/test_sandbox.py` (passing run, failing assertion capture, infinite-loop timeout), `tests/test_schemas.py` (validation) and `tests/test_orchestration.py` (halts on iteration 1 pass; stops at exactly 4 with `MAX_CYCLES_EXCEEDED`).
 - **Code change for Test 3:** the sandbox gained `SandboxTimeoutError`, raised by the low-level runner (`run_python`), so a timeout is a real exception as the assignment words it. `run_tests` still catches it and returns a `timed_out` result so the squad loop keeps running.
 - **Extra tests lock in the audit fixes:** secrets invisible in the sandbox (Step 3 item 1), a lying LLM cannot override a failing exit code (item 3), bug injector only breaks code that passes, a custom iteration ceiling is respected.
+
+---
+
+## Step 6: Live Deployment Findings
+
+The app was deployed to Streamlit Community Cloud and a real run confirmed the sandbox, pytest and Secrets work on the cloud server (Linux, Python 3.11). That run ended MAX_CYCLES_EXCEEDED on the Token Bucket request because the Coder's own tests were flaky (timing and thread assumptions), which also exercised the circuit breaker for real.
+
+- **Run counter lag:** the sidebar "runs used" counter updated one interaction late; fixed with a placeholder updated immediately.
+- **Flaky generated tests:** OpenAI's default temperature made runs vary. Prompt tightening did not help and was reverted. Lowering temperature to 0.2 on all three agents (`OPENAI_TEMPERATURE`) did, with a mock test asserting it is sent.
+- **Result:** LRU Cache with bug injection, 3 of 3 runs: bug injected, caught by QA, repaired, ended CONVERGED in 2 to 3 iterations. Token Bucket remains the less reliable example; the circuit breaker handles the failure case.

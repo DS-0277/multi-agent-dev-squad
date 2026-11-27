@@ -11,6 +11,8 @@ from src.schemas import CodeArtifact, QAReport
 
 load_dotenv()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+# Low temperature = steadier, more repeatable output (fewer flaky generated tests).
+TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
 
 SYSTEM_PROMPT = (
     "You are a Reviewer/QA Agent. Given code and the pytest output, audit the code "
@@ -27,6 +29,7 @@ def run_reviewer_agent(code: CodeArtifact) -> QAReport:
     client = OpenAI()
     resp = client.chat.completions.create(
         model=MODEL,
+        temperature=TEMPERATURE,
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},

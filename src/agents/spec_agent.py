@@ -8,6 +8,8 @@ from src.schemas import SpecArtifact
 
 load_dotenv()
 MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
+# Low temperature = steadier, more repeatable output (fewer flaky generated tests).
+TEMPERATURE = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
 
 SYSTEM_PROMPT = (
     "You are a Product Spec Agent. Turn the user's request into a technical "
@@ -21,6 +23,7 @@ def run_spec_agent(user_request: str) -> SpecArtifact:
     client = OpenAI()
     resp = client.chat.completions.create(
         model=MODEL,
+        temperature=TEMPERATURE,
         response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},

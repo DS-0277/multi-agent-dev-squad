@@ -151,6 +151,7 @@
 | 2026-11-26 | Step 4 built: Streamlit UI, mechanical bug injector, default model gpt-4o; pushed |
 | 2026-11-26 | Step 5 built: 21 tests passing (6 required + 15 extra), SandboxTimeoutError added; pushed |
 | 2026-11-26 | Step 6 repo prep: requirements.txt, run limit (24 tests pass); cloud deploy pending (student) |
+| 2026-11-26 | App deployed on Streamlit Cloud; live run verified; temperature 0.2 and counter fix local, push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |

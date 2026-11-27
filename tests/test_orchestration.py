@@ -93,3 +93,35 @@ def test_bug_injection_only_touches_first_iteration():
     assert injected_on == [1]
     assert final["injected_bug"] == "fake bug"
     assert final["report"].status == "PASSED"
+
+
+# ---------- Bonus: every agent asks the LLM for low-randomness output ----------
+def test_agents_request_low_temperature_from_the_llm():
+    import json
+    from unittest.mock import MagicMock, patch
+
+    from src.agents import coder_agent, reviewer_agent, spec_agent
+
+    def fake_client(content: dict) -> MagicMock:
+        client = MagicMock()
+        client.chat.completions.create.return_value.choices = [
+            MagicMock(message=MagicMock(content=json.dumps(content)))
+        ]
+        return client
+
+    spec_json = {"feature_name": "F", "requirements": [], "test_cases": [], "interfaces": ""}
+    code_json = {"implementation_code": "x = 1", "test_code": "def test_x(): pass"}
+    qa_json = {"review_feedback": []}
+    spec = SpecArtifact(**spec_json)
+    code = CodeArtifact(implementation_code="x = 1", test_code="def test_x(): pass", iteration=1)
+
+    for module, call, content in [
+        (spec_agent, lambda: spec_agent.run_spec_agent("req"), spec_json),
+        (coder_agent, lambda: coder_agent.run_coder_agent(spec, 1), code_json),
+        (reviewer_agent, lambda: reviewer_agent.run_reviewer_agent(code), qa_json),
+    ]:
+        client = fake_client(content)
+        with patch.object(module, "OpenAI", return_value=client):
+            call()
+        kwargs = client.chat.completions.create.call_args.kwargs
+        assert kwargs["temperature"] <= 0.3, module.__name__
