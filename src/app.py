@@ -32,6 +32,8 @@ EXAMPLES = {
     ),
 }
 
+MAX_RUNS_PER_SESSION = 5  # soft cost guard for the public demo
+
 STATUS_LABELS = {
     "idle": "⚪ READY",
     "running": "🟡 IN PROGRESS",
@@ -116,11 +118,23 @@ with st.sidebar:
         help="Break the Coder's first pass on purpose to watch QA catch it and the Coder self-correct.",
     )
     st.markdown(f"**Max refinement cycles:** {MAX_ITERATIONS}")
+    st.markdown(
+        f"**Runs this session:** {st.session_state.get('runs_used', 0)} / {MAX_RUNS_PER_SESSION}"
+    )
     st.caption("The pass/fail verdict comes from pytest's exit code, never from an AI opinion.")
 
 example = st.selectbox("Example requests", list(EXAMPLES))
 request = st.text_area("Feature request", value=EXAMPLES[example], height=110, key=f"req_{example}")
-run_clicked = st.button("Run squad", type="primary", disabled=not request.strip())
+runs_used = st.session_state.get("runs_used", 0)
+limit_reached = runs_used >= MAX_RUNS_PER_SESSION
+run_clicked = st.button(
+    "Run squad", type="primary", disabled=(not request.strip() or limit_reached)
+) and not limit_reached
+if limit_reached:
+    st.warning(
+        f"Demo limit reached ({MAX_RUNS_PER_SESSION} runs per session). "
+        "Refresh the page to start a new session."
+    )
 
 if not os.getenv("OPENAI_API_KEY"):
     st.error("OPENAI_API_KEY is not set. Add it to your local .env file (or to Streamlit secrets).")
@@ -132,6 +146,7 @@ spec_tab, coder_tab, qa_tab = st.tabs(["📋 Spec Board", "💻 Coder Terminal",
 ph["spec"], ph["coder"], ph["qa"] = spec_tab.empty(), coder_tab.empty(), qa_tab.empty()
 
 if run_clicked:
+    st.session_state["runs_used"] = runs_used + 1
     run = new_run(inject_bug)
     st.session_state["run"] = run
     render(run, ph)

@@ -24,7 +24,7 @@
 | 3 | Audit & Verify the AI Output | ✅ | ✅ | ✅ |
 | 4 | Build the Interactive Web Interface | ✅ | ✅ | ✅ |
 | 5 | Execute Structured Web Project QA Test Suite | ✅ | ✅ | ✅ |
-| 6 | Deployment & Packaging (Streamlit Community Cloud) | ⬜ | ⬜ | ⬜ |
+| 6 | Deployment & Packaging (Streamlit Community Cloud) | ✅ | 🟡 repo ready; cloud deploy by student | ⬜ |
 | — | Final deliverables (README, finalized audit log) | ⬜ | ⬜ | ⬜ |
 
 ---
@@ -109,11 +109,12 @@
 
 ---
 
-## Step 6: Deployment & Packaging (Option B: Streamlit Community Cloud) — ⬜
+## Step 6: Deployment & Packaging (Option B: Streamlit Community Cloud) — 🟡 (repo ready, cloud deploy pending)
 
 **Goal:** A reproducible, publicly reachable app with secrets handled safely.
 
-- [ ] Make sure dependencies are deployable (`requirements.txt` or a `pyproject.toml` that Streamlit Cloud can read)
+- [x] Make sure dependencies are deployable (`requirements.txt` exported from `uv.lock`; git history scanned: no keys)
+- [x] Per-session run limit (5) added as a cost guard, with tests in `tests/test_app.py`
 - [ ] Put `OPENAI_API_KEY` in Streamlit's **Secrets** manager (never committed)
 - [ ] Confirm the host allows subprocess execution, and that the sandbox and pytest work there
 - [ ] Deploy from the GitHub repo, with `src/app.py` as the entry point
@@ -149,6 +150,7 @@
 | 2026-11-26 | Step 3 audit done: defects in items 1 and 3 fixed, items 2 and 4 good; pushed |
 | 2026-11-26 | Step 4 built: Streamlit UI, mechanical bug injector, default model gpt-4o; pushed |
 | 2026-11-26 | Step 5 built: 21 tests passing (6 required + 15 extra), SandboxTimeoutError added; pushed |
+| 2026-11-26 | Step 6 repo prep: requirements.txt, run limit (24 tests pass); cloud deploy pending (student) |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
