@@ -25,7 +25,7 @@
 | 4 | Build the Interactive Web Interface | ✅ | ✅ | ✅ |
 | 5 | Execute Structured Web Project QA Test Suite | ✅ | ✅ | ✅ |
 | 6 | Deployment & Packaging (Streamlit Community Cloud) | ✅ | 🟡 repo ready; cloud deploy by student | ⬜ |
-| — | Final deliverables (README, finalized audit log) | ⬜ | ⬜ | ⬜ |
+| — | Final deliverables (README, finalized audit log) | ✅ | ✅ | ⬜ (awaiting push) |
 
 ---
 
@@ -127,8 +127,8 @@
 
 ## Final deliverables (after Step 6)
 
-- [ ] **README.md** with: Mermaid architecture diagram, install/setup (uv, Python 3.11), schema and context-passing docs, sandbox security boundaries, run commands (UI and `pytest -v`), AI audit log summary
-- [ ] **ai_prompt_log.md** finalized
+- [x] **README.md** with: Mermaid architecture diagram, install/setup (uv, Python 3.11), schema and context-passing docs, sandbox security boundaries, run commands (UI and `pytest -v`), AI audit log summary
+- [x] **ai_prompt_log.md** finalized
 
 *(Video and LMS submission are handled by the student, outside this plan.)*
 
@@ -152,6 +152,7 @@
 | 2026-11-26 | Step 5 built: 21 tests passing (6 required + 15 extra), SandboxTimeoutError added; pushed |
 | 2026-11-26 | Step 6 repo prep: requirements.txt, run limit (24 tests pass); cloud deploy pending (student) |
 | 2026-11-26 | App deployed on Streamlit Cloud; live run verified; temperature 0.2 and counter fix local, push pending |
+| 2026-11-26 | README written; push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
