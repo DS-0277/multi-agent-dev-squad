@@ -10,7 +10,7 @@ from src.sandbox import run_tests
 from src.schemas import CodeArtifact, QAReport
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 SYSTEM_PROMPT = (
     "You are a Reviewer/QA Agent. Given code and the pytest output, audit the code "

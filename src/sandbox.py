@@ -38,5 +38,11 @@ def run_tests(implementation_code: str, test_code: str) -> SandboxResult:
                 env=SAFE_ENV,
             )
         except subprocess.TimeoutExpired:
-            return SandboxResult(-1, "", "Timed out", timed_out=True)
+            return SandboxResult(
+                -1,
+                "",
+                f"Execution timed out after {TIMEOUT_SECONDS}s "
+                "(possible infinite loop or deadlock).",
+                timed_out=True,
+            )
         return SandboxResult(proc.returncode, proc.stdout, proc.stderr)

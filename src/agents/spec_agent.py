@@ -7,7 +7,7 @@ from openai import OpenAI
 from src.schemas import SpecArtifact
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 SYSTEM_PROMPT = (
     "You are a Product Spec Agent. Turn the user's request into a technical "

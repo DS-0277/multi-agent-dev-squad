@@ -8,13 +8,19 @@ from openai import OpenAI
 from src.schemas import CodeArtifact, QAReport, SpecArtifact
 
 load_dotenv()
-MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+MODEL = os.getenv("OPENAI_MODEL", "gpt-4o")
 
 SYSTEM_PROMPT = (
     "You are a Coder Agent. Write clean, modular Python 3.11 code for the spec. "
     "Produce solution.py and test_solution.py (pytest; import from solution). "
     "Reply with JSON having keys: implementation_code (str), test_code (str). "
-    "If a previous QA report is given, fix the reported problems."
+    "If a previous QA report is given, fix the reported problems with the smallest "
+    "possible change: keep all code that already works exactly as it is and do not "
+    "rewrite the whole solution. "
+    "Rules: avoid deadlocks (use threading.RLock if methods call each other while "
+    "holding the lock); never use infinite loops; tests must finish in well under "
+    "5 seconds in total (use time.sleep of 0.3 seconds or less); and tests must "
+    "not depend on exact thread timing."
 )
 
 

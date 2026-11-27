@@ -114,3 +114,17 @@ The reviewer prompt was also changed so the LLM only returns `review_feedback` (
 ### 4. Infinite refinement loops: GOOD, NO DEFECT FOUND
 
 The orchestrator increments `iteration` in the coder node, and `qa_node` sets `MAX_CYCLES_EXCEEDED` whenever tests fail at `iteration >= MAX_ITERATIONS` (4), after which the graph routes to `END`. Automated proof (Test 6, exactly 4 iterations) comes in Step 5.
+
+---
+
+## Step 4: Web Interface and Live-Testing Findings
+
+Built `src/app.py` (Streamlit) and made the orchestrator stream progress (`stream_squad`) so each panel updates live. Real OpenAI runs during testing exposed three more problems, all fixed:
+
+1. **LLM-written bug injection was unreliable.** First design: ask the Coder to write one subtle bug. Result: the bug sometimes slipped past the Coder's own tests (run passed on iteration 1, so nothing to demonstrate) or caused a deadlock. **Fix:** `src/bug_injector.py` flips one operator mechanically (for example `>=` to `>`) in the Coder's correct first-pass code and keeps only a flip that makes the tests fail. It first checks the baseline passes, otherwise a broken test file could be mistaken for a caught bug (this second flaw was found by a real Token Bucket run whose test file had a syntax error).
+2. **Coder rewrote everything on repair and introduced deadlocks.** **Fix:** the Coder prompt now demands the smallest possible change, `RLock` when methods call each other, no infinite loops, and fast tests.
+3. **Opaque timeout message.** A hung run only reported "Timed out". **Fix:** the sandbox now says the run exceeded 10s and may have an infinite loop or deadlock, so the Coder can act on it.
+
+**Model choice.** `gpt-4o-mini` and `gpt-4.1-mini` were flaky on bug-injection runs (several ended MAX_CYCLES). `gpt-4o` converged in the runs tested, so it is now the default (override with `OPENAI_MODEL`).
+
+**Result.** Token Bucket with bug injection: 3 of 3 runs failed once with a clear trace, then passed on iteration 2. Full UI run via Streamlit's test harness ended CONVERGED. LLM output is non-deterministic, so a run can occasionally need more cycles or hit the 4-cycle ceiling; the circuit breaker handles that case.
