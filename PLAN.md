@@ -23,7 +23,7 @@
 | 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ✅ |
 | 3 | Audit & Verify the AI Output | ✅ | ✅ | ✅ |
 | 4 | Build the Interactive Web Interface | ✅ | ✅ | ✅ |
-| 5 | Execute Structured Web Project QA Test Suite | ⬜ | ⬜ | ⬜ |
+| 5 | Execute Structured Web Project QA Test Suite | ✅ | ✅ | ⬜ (awaiting push) |
 | 6 | Deployment & Packaging (Streamlit Community Cloud) | ⬜ | ⬜ | ⬜ |
 | — | Final deliverables (README, finalized audit log) | ⬜ | ⬜ | ⬜ |
 
@@ -90,20 +90,20 @@
 
 ---
 
-## Step 5: Execute Structured Web Project QA Test Suite — ⬜
+## Step 5: Execute Structured Web Project QA Test Suite — 🟡 (built, push pending)
 
 **Goal:** Six automated tests under `/tests`, all passing with `pytest -v`.
 
-- [ ] `test_sandbox.py`:
-  - [ ] Test 1: passing execution (exit 0, `tests_passed == True`)
-  - [ ] Test 2: failing assertion capture (`assert 1 == 2`, exit != 0, trace captured)
-  - [ ] Test 3: infinite loop timeout (`while True: pass`, killed within 10s)
-- [ ] `test_schemas.py`:
-  - [ ] Test 4: schema serialization and validation (valid and invalid inputs)
-- [ ] `test_orchestration.py` (mocked agents, no API cost):
-  - [ ] Test 5: clean convergence on iteration 1 → `PASSED`, no extra iterations
-  - [ ] Test 6: continuous failures → stops at exactly 4 with `MAX_CYCLES_EXCEEDED`
-- [ ] Capture the `pytest -v` output for the video
+- [x] `test_sandbox.py`:
+  - [x] Test 1: passing execution (exit 0, `tests_passed == True`)
+  - [x] Test 2: failing assertion capture (`assert 1 == 2`, exit != 0, trace captured)
+  - [x] Test 3: infinite loop timeout (`while True: pass`, killed within 10s)
+- [x] `test_schemas.py`:
+  - [x] Test 4: schema serialization and validation (valid and invalid inputs)
+- [x] `test_orchestration.py` (mocked agents, no API cost):
+  - [x] Test 5: clean convergence on iteration 1 → `PASSED`, no extra iterations
+  - [x] Test 6: continuous failures → stops at exactly 4 with `MAX_CYCLES_EXCEEDED`
+- [x] Capture the `pytest -v` output for the video
 
 **Done when:** `uv run pytest -v` shows all six passing.
 
@@ -148,6 +148,7 @@
 | 2026-11-26 | Step 2 draft generated and committed unaudited and pushed |
 | 2026-11-26 | Step 3 audit done: defects in items 1 and 3 fixed, items 2 and 4 good; pushed |
 | 2026-11-26 | Step 4 built: Streamlit UI, mechanical bug injector, default model gpt-4o; pushed |
+| 2026-11-26 | Step 5 built: 21 tests passing (6 required + 15 extra), SandboxTimeoutError added; push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |

@@ -128,3 +128,13 @@ Built `src/app.py` (Streamlit) and made the orchestrator stream progress (`strea
 **Model choice.** `gpt-4o-mini` and `gpt-4.1-mini` were flaky on bug-injection runs (several ended MAX_CYCLES). `gpt-4o` converged in the runs tested, so it is now the default (override with `OPENAI_MODEL`).
 
 **Result.** Token Bucket with bug injection: 3 of 3 runs failed once with a clear trace, then passed on iteration 2. Full UI run via Streamlit's test harness ended CONVERGED. LLM output is non-deterministic, so a run can occasionally need more cycles or hit the 4-cycle ceiling; the circuit breaker handles that case.
+
+---
+
+## Step 5: Automated QA Test Suite
+
+21 tests, all passing (`uv run pytest -v`, about 30s, no OpenAI calls). Agents and the LLM are replaced by scripted fakes.
+
+- **Required Tests 1 to 6** are in `tests/test_sandbox.py` (passing run, failing assertion capture, infinite-loop timeout), `tests/test_schemas.py` (validation) and `tests/test_orchestration.py` (halts on iteration 1 pass; stops at exactly 4 with `MAX_CYCLES_EXCEEDED`).
+- **Code change for Test 3:** the sandbox gained `SandboxTimeoutError`, raised by the low-level runner (`run_python`), so a timeout is a real exception as the assignment words it. `run_tests` still catches it and returns a `timed_out` result so the squad loop keeps running.
+- **Extra tests lock in the audit fixes:** secrets invisible in the sandbox (Step 3 item 1), a lying LLM cannot override a failing exit code (item 3), bug injector only breaks code that passes, a custom iteration ceiling is respected.
