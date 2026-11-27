@@ -154,6 +154,7 @@
 | 2026-11-26 | App deployed on Streamlit Cloud; live run verified; temperature 0.2 and counter fix local, push pending |
 | 2026-11-26 | README written and pushed |
 | 2026-11-26 | Step 6 marked done: deployed at the live URL, sandbox verified on cloud |
+| 2026-11-26 | Reliability fixes: focused error diff, stuck detection, clock-based examples; 29 tests; push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |

@@ -125,3 +125,82 @@ def test_agents_request_low_temperature_from_the_llm():
             call()
         kwargs = client.chat.completions.create.call_args.kwargs
         assert kwargs["temperature"] <= 0.3, module.__name__
+
+
+# ---------- Bonus: focused repair feedback and stuck detection ----------
+SAMPLE_OUTPUT = """\
+===== test session starts =====
+platform linux -- Python 3.11.18 -- NOISE-BANNER
+test_solution.py::test_ok PASSED                                  [ 50%]
+test_solution.py::test_refill FAILED                              [100%]
+=========== FAILURES ===========
+E       assert True is False
+E        +  where True = allow(1)
+=========== short test summary info ===========
+FAILED test_solution.py::test_refill - assert True is False
+"""
+
+
+def test_failing_tests_are_extracted_from_pytest_output():
+    from src.failure_summary import failing_tests
+
+    assert failing_tests(SAMPLE_OUTPUT) == ["test_refill"]
+
+
+def test_summary_keeps_error_lines_and_drops_noise():
+    from src.failure_summary import summarize_failures
+
+    summary = summarize_failures(SAMPLE_OUTPUT)
+    assert "assert True is False" in summary
+    assert "NOISE-BANNER" not in summary
+    assert "test_ok" not in summary
+
+
+def test_coder_receives_focused_error_diff_not_raw_output():
+    import json
+    from unittest.mock import MagicMock, patch
+
+    from src.agents import coder_agent
+
+    client = MagicMock()
+    client.chat.completions.create.return_value.choices = [
+        MagicMock(message=MagicMock(content=json.dumps(
+            {"implementation_code": "x = 1", "test_code": "def test_x(): pass"}
+        )))
+    ]
+    spec = SpecArtifact(feature_name="F", requirements=[], test_cases=[], interfaces="")
+    code = CodeArtifact(implementation_code="x = 0", test_code="def test_x(): pass", iteration=1)
+    report = QAReport(
+        tests_passed=False, total_tests=2, failed_tests=1, execution_output=SAMPLE_OUTPUT,
+        review_feedback=["note one"], status="NEEDS_REVISION",
+    )
+    with patch.object(coder_agent, "OpenAI", return_value=client):
+        coder_agent.run_coder_agent(spec, 2, code, report)
+    prompt = client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+    assert "test_refill" in prompt
+    assert "assert True is False" in prompt
+    assert "note one" in prompt
+    assert "NOISE-BANNER" not in prompt
+
+
+def test_stuck_note_added_when_same_tests_fail_twice_in_a_row():
+    seen_feedback = {}
+
+    class Fake(FakeSquad):
+        def coder(self, spec, iteration, previous_code=None, previous_report=None):
+            seen_feedback[iteration] = (
+                previous_report.review_feedback if previous_report else None
+            )
+            return super().coder(spec, iteration, previous_code, previous_report)
+
+        def qa(self, code):
+            report = super().qa(code)
+            return report.model_copy(update={
+                "execution_output": "FAILED test_solution.py::test_same - boom"
+            })
+
+    run_with(Fake(passes_on=None))
+    assert seen_feedback[1] is None
+    assert not any("STUCK" in f for f in seen_feedback[2])  # first failure
+    assert seen_feedback[3][0].startswith("STUCK")          # same test failed twice
+    assert "test_same" in seen_feedback[3][0]

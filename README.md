@@ -66,7 +66,8 @@ src/
     spec_agent.py       Product & Requirements Engineer
     coder_agent.py      Implementation & test generator
     reviewer_agent.py   Auditor & pytest execution evaluator
-tests/                  25 tests (sandbox, schemas, orchestration, UI)
+tests/                  29 tests (sandbox, schemas, orchestration, UI)
+  failure_summary.py    Condenses pytest output into a short error diff for the Coder
 ```
 
 ### Pydantic schemas (`src/schemas.py`)
@@ -87,7 +88,7 @@ Agents never receive a cumulative chat history. Each agent gets only the typed a
 |---|---|---|
 | Spec Agent | The user request | `SpecArtifact` |
 | Coder Agent, iteration 1 | `SpecArtifact` | `CodeArtifact` |
-| Coder Agent, iteration 2+ | `SpecArtifact`, its **latest** `CodeArtifact`, the **latest** `QAReport` | `CodeArtifact` |
+| Coder Agent, iteration 2+ | `SpecArtifact`, its **latest** `CodeArtifact`, and a short **error diff** from the latest `QAReport` (failing test names, error lines, up to 3 reviewer notes) | `CodeArtifact` |
 | QA Agent | The latest `CodeArtifact` | `QAReport` |
 
 Older iterations are discarded, so context size stays flat however many cycles run.
@@ -119,7 +120,7 @@ uv run pytest -v                    # run the full test suite (about 30 seconds,
 
 **Using the UI:** pick or write a request, optionally switch on **Adversarial bug injection** (breaks the Coder's first pass so you can watch QA catch it and the Coder self-correct), then click **Run squad**. The Spec Board, Coder Terminal and QA Test Runner Console tabs update live, with an iteration badge and a status light: 🟡 IN PROGRESS, 🟢 CONVERGED (ALL TESTS PASS), 🔴 TERMINATED (MAX CYCLES).
 
-**Tests (25):** sandbox pass/fail/timeout, key isolation, schema validation, clean convergence on iteration 1, termination at exactly 4 iterations, bug injector behavior, run-limit and temperature checks. All agent and LLM calls are mocked, so the suite is free.
+**Tests (29):** sandbox pass/fail/timeout, key isolation, schema validation, clean convergence on iteration 1, termination at exactly 4 iterations, bug injector behavior, run-limit and temperature checks, focused repair feedback, and stuck detection. All agent and LLM calls are mocked, so the suite is free.
 
 **Deployment (Streamlit Community Cloud):** create an app from this repo with main file `src/app.py` and Python 3.11, and add `OPENAI_API_KEY = "sk-..."` under the app's Secrets. The app reads it from `st.secrets`.
 
@@ -139,6 +140,6 @@ Further issues found by running the real system:
 - **LLM-written bug injection was unreliable**, so it was replaced by a mechanical operator flip that is kept only if the tests then fail, and only injected into code that passes its own tests first.
 - **The Coder rewrote whole solutions and caused deadlocks** on repair; its prompt now requires minimal fixes.
 - **Timeouts gave the Coder no useful feedback**; the message now explains the 10s limit.
-- **Flaky AI-written tests** caused inconsistent runs; lowering temperature to 0.2 steadied them.
+- **Flaky AI-written tests** caused inconsistent runs. Fixes: temperature 0.2; the Coder now gets a focused error diff instead of the whole pytest log; if the same tests fail twice in a row the orchestrator tells the Coder its last fix did not work and the test itself may be wrong; and the example requests ask for an injectable clock so tests do not depend on real sleeping.
 
-**Known limitations:** LLM output varies between runs, so a run can occasionally need more cycles or end 🔴 at the 4-cycle limit (the circuit breaker working as designed). Simpler requests such as the LRU Cache are more reliable than timing-heavy ones such as the Token Bucket.
+**Known limitations:** LLM output varies between runs, so a run can occasionally need more cycles or end 🔴 at the 4-cycle limit (the circuit breaker working as designed). Timing-heavy requests such as the Token Bucket are less reliable than simpler ones such as the LRU Cache.

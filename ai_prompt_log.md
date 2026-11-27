@@ -148,3 +148,16 @@ The app was deployed to Streamlit Community Cloud and a real run confirmed the s
 - **Run counter lag:** the sidebar "runs used" counter updated one interaction late; fixed with a placeholder updated immediately.
 - **Flaky generated tests:** OpenAI's default temperature made runs vary. Prompt tightening did not help and was reverted. Lowering temperature to 0.2 on all three agents (`OPENAI_TEMPERATURE`) did, with a mock test asserting it is sent.
 - **Result:** LRU Cache with bug injection, 3 of 3 runs: bug injected, caught by QA, repaired, ended CONVERGED in 2 to 3 iterations. Token Bucket remains the less reliable example; the circuit breaker handles the failure case.
+
+---
+
+## Step 6 (continued): Stuck Runs on the Cloud App
+
+A normal Token Bucket run on the live app ended MAX_CYCLES_EXCEEDED: one test kept failing in iterations 2 to 4 and the Coder could not repair it. Root causes found: the Coder received the whole raw pytest log (the one failing assertion was buried), nothing told it when a fix had not worked, and the Token Bucket request invited tests that depend on real `time.sleep` and thread timing.
+
+Fixes (all covered by free mock tests, 29 tests total):
+1. **Focused error diff** (`src/failure_summary.py`): the Coder gets failing test names, error lines and up to 3 reviewer notes, instead of the full `QAReport` JSON. This also matches the assignment's "latest QAReport error diff" wording.
+2. **Stuck detection** (`src/orchestrator.py`): if the same tests fail on two consecutive attempts, a "STUCK" note is prepended to the feedback telling the Coder its last fix failed and the test itself may be wrong.
+3. **Example requests** now ask for an optional injectable clock (default `time.monotonic`) so generated tests can control time instead of sleeping; the LRU Cache example is listed first.
+
+**Result (live, 4 runs):** Token Bucket normal x2, Token Bucket with bug injection x1, LRU Cache with bug injection x1: all 4 converged on iteration 2. Before these fixes, 8 of 8 Token Bucket runs ended MAX_CYCLES_EXCEEDED. In the Token Bucket bug-injection run the Coder's first pass already failed on its own, so no bug was injected and the natural failure was repaired instead. Small sample; LLM output still varies.

@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from src.failure_summary import failing_tests, summarize_failures
 from src.schemas import CodeArtifact, QAReport, SpecArtifact
 
 load_dotenv()
@@ -26,6 +27,18 @@ SYSTEM_PROMPT = (
 )
 
 
+def format_qa_feedback(report: QAReport) -> str:
+    """A short, focused error diff: failing tests, error lines, reviewer notes."""
+    failing = failing_tests(report.execution_output) or ["(see error summary)"]
+    notes = "\n".join(f"- {n[:300]}" for n in report.review_feedback[:3]) or "- none"
+    return (
+        f"QA result: {report.failed_tests} failed of {report.total_tests} tests.\n"
+        f"Failing tests: {', '.join(failing)}\n"
+        f"Error summary:\n{summarize_failures(report.execution_output)}\n"
+        f"Reviewer notes:\n{notes}"
+    )
+
+
 def run_coder_agent(
     spec: SpecArtifact,
     iteration: int,
@@ -37,7 +50,7 @@ def run_coder_agent(
         user_content += (
             f"\n\nPrevious code:\n{previous_code.implementation_code}"
             f"\n\nPrevious tests:\n{previous_code.test_code}"
-            f"\n\nQA report:\n{previous_report.model_dump_json(indent=2)}"
+            f"\n\n{format_qa_feedback(previous_report)}"
         )
     client = OpenAI()
     resp = client.chat.completions.create(

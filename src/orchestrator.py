@@ -7,6 +7,7 @@ from src.agents.coder_agent import run_coder_agent
 from src.agents.reviewer_agent import run_reviewer_agent
 from src.agents.spec_agent import run_spec_agent
 from src.bug_injector import inject_logic_bug
+from src.failure_summary import UNKNOWN_FAILURE, failing_tests
 from src.schemas import CodeArtifact, QAReport, SpecArtifact
 
 MAX_ITERATIONS = 4
@@ -19,6 +20,8 @@ class SquadState(TypedDict, total=False):
     report: QAReport
     iteration: int
     injected_bug: str
+    failing: list[str]
+    prev_failing: list[str]
 
 
 def build_graph(
@@ -36,9 +39,20 @@ def build_graph(
 
     def coder_node(state: SquadState) -> SquadState:
         iteration = state["iteration"] + 1
-        code = coder_fn(
-            state["spec"], iteration, state.get("code"), state.get("report")
-        )
+        report = state.get("report")
+        failing, prev = state.get("failing"), state.get("prev_failing")
+        if report is not None and failing and failing == prev:
+            # Same tests failed twice in a row: the last fix did not work.
+            note = (
+                "STUCK: the same tests failed in the previous attempt too "
+                f"({', '.join(failing)}). Your last fix did not work. The test "
+                "itself may be wrong, or depend on real timing or thread "
+                "scheduling. Fix or simplify that test as well as the code."
+            )
+            report = report.model_copy(
+                update={"review_feedback": [note, *report.review_feedback]}
+            )
+        code = coder_fn(state["spec"], iteration, state.get("code"), report)
         update: SquadState = {"code": code, "iteration": iteration}
         if inject_bug and iteration == 1:
             code, description = bug_injector(code)
@@ -50,7 +64,14 @@ def build_graph(
         report = qa_fn(state["code"])
         if not report.tests_passed and state["iteration"] >= max_iterations:
             report = report.model_copy(update={"status": "MAX_CYCLES_EXCEEDED"})
-        return {"report": report}
+        failing = [] if report.tests_passed else (
+            failing_tests(report.execution_output) or [UNKNOWN_FAILURE]
+        )
+        return {
+            "report": report,
+            "failing": failing,
+            "prev_failing": state.get("failing", []),
+        }
 
     def route_after_qa(state: SquadState) -> str:
         # Unconditional bound: passing or hitting the iteration ceiling ends the run.

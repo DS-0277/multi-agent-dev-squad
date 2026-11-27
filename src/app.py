@@ -20,15 +20,19 @@ except Exception:
 
 st.set_page_config(page_title="Multi-Agent Dev Squad", page_icon="🛠️", layout="wide")
 
+CLOCK_NOTE = (
+    " Accept an optional clock function (defaulting to time.monotonic) so tests "
+    "can control time without sleeping."
+)
 EXAMPLES = {
+    "LRU Cache with TTL": (
+        "Build a Python LRU Cache with TTL eviction, thread-safe, with get, put and "
+        "size methods." + CLOCK_NOTE
+    ),
     "Token Bucket rate limiter": (
         "Build a robust Python rate-limiting class using the Token Bucket algorithm "
         "with thread-safety, microsecond precision, burst allowance, and refill rate "
-        "calculation."
-    ),
-    "LRU Cache with TTL": (
-        "Build a Python LRU Cache with TTL eviction, thread-safe, with get, put and "
-        "size methods."
+        "calculation." + CLOCK_NOTE
     ),
 }
 
