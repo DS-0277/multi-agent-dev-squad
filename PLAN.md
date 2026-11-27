@@ -22,7 +22,7 @@
 | 1 | Environment Setup & Project Layout | ✅ | ✅ | ✅ |
 | 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ✅ |
 | 3 | Audit & Verify the AI Output | ✅ | ✅ | ✅ |
-| 4 | Build the Interactive Web Interface | ✅ | ✅ | ⬜ (awaiting push) |
+| 4 | Build the Interactive Web Interface | ✅ | ✅ | ✅ |
 | 5 | Execute Structured Web Project QA Test Suite | ⬜ | ⬜ | ⬜ |
 | 6 | Deployment & Packaging (Streamlit Community Cloud) | ⬜ | ⬜ | ⬜ |
 | — | Final deliverables (README, finalized audit log) | ⬜ | ⬜ | ⬜ |
@@ -75,7 +75,7 @@
 
 ---
 
-## Step 4: Build the Interactive Web Interface (Streamlit) — 🟡 (built, push pending)
+## Step 4: Build the Interactive Web Interface (Streamlit) — ✅
 
 **Goal:** `src/app.py` gives clear visibility into the squad.
 
@@ -147,7 +147,7 @@
 | 2026-11-26 | Plan created and approved |
 | 2026-11-26 | Step 2 draft generated and committed unaudited and pushed |
 | 2026-11-26 | Step 3 audit done: defects in items 1 and 3 fixed, items 2 and 4 good; pushed |
-| 2026-11-26 | Step 4 built: Streamlit UI, mechanical bug injector, default model gpt-4o; push pending |
+| 2026-11-26 | Step 4 built: Streamlit UI, mechanical bug injector, default model gpt-4o; pushed |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
