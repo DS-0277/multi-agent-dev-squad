@@ -14,8 +14,9 @@ MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 SYSTEM_PROMPT = (
     "You are a Reviewer/QA Agent. Given code and the pytest output, audit the code "
-    "for logic bugs and security flaws. Reply with JSON having keys: "
-    "tests_passed (bool), review_feedback (list[str])."
+    "for logic bugs and security flaws. You do NOT decide whether tests passed; "
+    "the test runner's exit code does. Reply with JSON having one key: "
+    "review_feedback (list[str])."
 )
 
 
@@ -39,13 +40,14 @@ def run_reviewer_agent(code: CodeArtifact) -> QAReport:
 
     passed_count = len(re.findall(r" PASSED", output))
     failed_count = len(re.findall(r" FAILED", output))
-    tests_passed = bool(verdict["tests_passed"])
+    # Deterministic: only the real pytest exit code decides pass/fail.
+    tests_passed = result.exit_code == 0 and not result.timed_out
 
     return QAReport(
         tests_passed=tests_passed,
         total_tests=passed_count + failed_count,
         failed_tests=failed_count,
         execution_output=output,
-        review_feedback=verdict["review_feedback"],
+        review_feedback=verdict.get("review_feedback", []),
         status="PASSED" if tests_passed else "NEEDS_REVISION",
     )

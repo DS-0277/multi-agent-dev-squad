@@ -17,12 +17,11 @@ class SquadState(TypedDict, total=False):
     code: CodeArtifact
     report: QAReport
     iteration: int
-    history: list[str]
 
 
 def spec_node(state: SquadState) -> SquadState:
     spec = run_spec_agent(state["user_request"])
-    return {"spec": spec, "iteration": 0, "history": [spec.model_dump_json()]}
+    return {"spec": spec, "iteration": 0}
 
 
 def coder_node(state: SquadState) -> SquadState:
@@ -30,16 +29,14 @@ def coder_node(state: SquadState) -> SquadState:
     code = run_coder_agent(
         state["spec"], iteration, state.get("code"), state.get("report")
     )
-    history = state["history"] + [code.model_dump_json()]
-    return {"code": code, "iteration": iteration, "history": history}
+    return {"code": code, "iteration": iteration}
 
 
 def qa_node(state: SquadState) -> SquadState:
     report = run_reviewer_agent(state["code"])
     if not report.tests_passed and state["iteration"] >= MAX_ITERATIONS:
         report = report.model_copy(update={"status": "MAX_CYCLES_EXCEEDED"})
-    history = state["history"] + [report.model_dump_json()]
-    return {"report": report, "history": history}
+    return {"report": report}
 
 
 def route_after_qa(state: SquadState) -> str:

@@ -21,7 +21,7 @@
 |---|---|---|---|---|
 | 1 | Environment Setup & Project Layout | ✅ | ✅ | ✅ |
 | 2 | Use AI to Create the Initial Draft | ✅ | ✅ | ✅ |
-| 3 | Audit & Verify the AI Output | ⬜ | ⬜ | ⬜ |
+| 3 | Audit & Verify the AI Output | ✅ | ✅ | ⬜ (awaiting push) |
 | 4 | Build the Interactive Web Interface | ⬜ | ⬜ | ⬜ |
 | 5 | Execute Structured Web Project QA Test Suite | ⬜ | ⬜ | ⬜ |
 | 6 | Deployment & Packaging (Streamlit Community Cloud) | ⬜ | ⬜ | ⬜ |
@@ -60,16 +60,16 @@
 
 ---
 
-## Step 3: Audit & Verify the AI Output — ⬜
+## Step 3: Audit & Verify the AI Output — 🟡 (built, push pending)
 
 **Goal:** Find and fix the four failure modes. Document each finding in `ai_prompt_log.md` (before → after).
 
-- [ ] **Audit 1, ACE and sandbox escapes:** no `shell=True`, args passed as a list, `timeout=10`, isolated `TemporaryDirectory`
-- [ ] **Audit 2, context bloat:** the Coder on iteration 2+ receives only `SpecArtifact` + latest `CodeArtifact` + latest `QAReport` (no growing history)
-- [ ] **Audit 3, sycophancy trap:** `tests_passed` is derived strictly from `exit_code == 0`, never from LLM judgment
-- [ ] **Audit 4, infinite loops:** `iteration >= max_iterations` unconditionally ends the run
-- [ ] Record at least two concrete flaws with the before/after code (needed for the video)
-- [ ] Commit and push the refactor
+- [x] **Audit 1, ACE and sandbox escapes:** no `shell=True`, args passed as a list, `timeout=10`, isolated `TemporaryDirectory`
+- [x] **Audit 2, context bloat:** the Coder on iteration 2+ receives only `SpecArtifact` + latest `CodeArtifact` + latest `QAReport` (no growing history)
+- [x] **Audit 3, sycophancy trap:** `tests_passed` is derived strictly from `exit_code == 0`, never from LLM judgment
+- [x] **Audit 4, infinite loops:** `iteration >= max_iterations` unconditionally ends the run
+- [x] Record at least two concrete flaws with the before/after code (needed for the video)
+- [x] Commit and push the refactor
 
 **Done when:** All four audits are checked, and `ai_prompt_log.md` shows the flaw, the risk and the fix for each.
 
@@ -146,6 +146,7 @@
 |---|---|
 | 2026-11-26 | Plan created and approved |
 | 2026-11-26 | Step 2 draft generated and committed unaudited and pushed |
+| 2026-11-26 | Step 3 audit done: defects in items 1 and 3 fixed, items 2 and 4 good; push pending |
 | 2026-11-26 | Dropped fastapi/uvicorn from dependencies (unused with Streamlit) |
 | 2026-11-26 | Step 1 built and pushed to GitHub |
 | 2026-11-26 | Removed video and submission sections (handled by student) |
